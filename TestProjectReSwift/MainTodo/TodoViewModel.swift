@@ -7,18 +7,20 @@
 
 import Foundation
 import ReSwift
-
-final class TodoViewModel: ObservableObject {
+  
+@MainActor final class TodoViewModel: ObservableObject {
     
     @Published var todos: [TodoItem] = []
-    @Published var currentView: NavigationStuff = .todos
+    @Published var items: [ExampleItem] = []
+    @Published var isLoading: Bool = true
+    @Published var errorMessage: String? = nil
     
-    private var store: Store<AppState>
+    private var Appstore: Store<AppState>
     
     init(store: Store<AppState>) {
-        self.store = store
-        store.subscribe(self) { subscription in
-            subscription.select { $0 }
+        self.Appstore = store
+        Appstore.subscribe(self) { subscription in
+            subscription.select { $0}
         }
     }
     
@@ -26,32 +28,42 @@ final class TodoViewModel: ObservableObject {
     func addTodo() {
         let newTodo = TodoItem(id: UUID(), text: "New Task", isCompleted: false)
 
-        store.dispatch(AddTodoAction(todo: newTodo))
+        Appstore.dispatch(AddTodoAction(todo: newTodo))
+    }
+    
+    func addTododFromButton(_ todo: TodoItem) {
+        Appstore.dispatch(AddTodoAction(todo: todo))
     }
     
     func removeTodo(id: UUID) {
-        store.dispatch(RemoveTodoAction(id: id))
+        Appstore.dispatch(RemoveTodoAction(id: id))
     }
     
     func toggleTodo(id: UUID) {
-        store.dispatch(ToggleTodoAction(id: id))
+        Appstore.dispatch(ToggleTodoAction(id: id))
+    }
+    
+    func loadExampleItems() {
+        Appstore.dispatch(LoadExampleItemsAction())
+    }
+    
+    func loadEXampleItemsWithThunk() {
+        Appstore.dispatch(thunkMiddleware)
     }
     
     func unsubscribe(_ viewModel: TodoViewModel) {
-        store.unsubscribe(viewModel)
-    }
-    func navigateToDetails(todo: TodoItem) {
-        store.dispatch(NavigateToDetailsAction())
+        Appstore.unsubscribe(viewModel)
     }
 }
 
 extension TodoViewModel: StoreSubscriber {
     
-    typealias StoreSubscriberStateType = AppState
-    
-    func newState(state: StoreSubscriberStateType) {
-        self.todos = state.todos
-        self.currentView = state.currentView
+    @MainActor func newState(state: AppState) {
+         Task {
+             self.todos = state.todos
+             self.items = state.items
+             self.isLoading = state.isLoading
+             self.errorMessage = state.errorMessage
+         }
     }
-    
 }

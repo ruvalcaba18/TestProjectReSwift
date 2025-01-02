@@ -15,6 +15,8 @@ public struct TodoItem {
 
 public struct AppState {
     var todos : [TodoItem] = [ ]
-    var currentView: NavigationStuff = .todos
+    var items: [ExampleItem] = []
+    var errorMessage: String? = nil
+    var isLoading: Bool = true
 }
 

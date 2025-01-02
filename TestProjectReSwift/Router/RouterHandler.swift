@@ -6,3 +6,8 @@
 //
 
 import Foundation
+import ReSwift
+
+protocol RouterHandler: Action {
+    func handle(state:RouteState) -> RouteState
+}

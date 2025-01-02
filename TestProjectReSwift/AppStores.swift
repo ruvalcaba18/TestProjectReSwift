@@ -8,10 +8,4 @@
 import Foundation
 import ReSwift
 
-public let mainStore = Store(
-    reducer: appReducer,
-    state: AppState(),
-    middleware: []
-)
-
-public let RouterStore = Store( reducer: routingReducer , state: RouteState() , middleware: [])
+public let mainStore = Store( reducer: appReducer, state: AppState(), middleware: [createAPIClientMiddleware()] )

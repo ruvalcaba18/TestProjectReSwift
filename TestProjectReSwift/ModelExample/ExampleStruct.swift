@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct ExampleItem: Identifiable, Codable{
+    let id: Int
+    let name: String
+    let isPresented: Bool
+}

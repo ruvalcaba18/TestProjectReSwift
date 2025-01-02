@@ -8,41 +8,74 @@
 import Foundation
 import ReSwift
 
-public protocol ActionHandler: Action {
-     func handle(state: AppState) -> AppState
+// Acción para iniciar la carga de los datos
+struct LoadExampleItemsAction: ActionHandler {
+    
+    func handle(state: AppState) -> AppState {
+        var newState = state
+        newState.isLoading = true
+        newState.errorMessage = ""
+        return newState
+    }
+}
+
+// Acción para actualizar el estado con los datos cargados
+struct ExampleItemsLoadedAction: ActionHandler {
+    
+    let items: [ExampleItem]
+    
+    func handle(state: AppState) -> AppState {
+        var newState = state
+        newState.items = items
+        newState.isLoading = false
+        print("items loaded -> ",items)
+        return newState
+    }
+}
+
+// Acción para manejar errores al cargar los datos
+struct ExampleItemsLoadingErrorAction: ActionHandler {
+    
+    let error: String
+    func handle(state: AppState) -> AppState {
+        var newState = state
+        newState.errorMessage = error
+        newState.isLoading = false
+        return newState
+    }
 }
 
 
 public struct AddTodoAction: ActionHandler {
+    public typealias StateType = AppState
     let todo:TodoItem
     
-    public func handle(state: AppState) -> AppState {
+    public func handle(state: StateType) -> StateType {
         var newState = state
-        newState.currentView = .todos
         newState.todos.append(todo)
         return newState
     }
 }
 
 public struct RemoveTodoAction: ActionHandler {
+    public typealias StateType = AppState
     let id:UUID
     
-    public func handle(state: AppState) -> AppState {
+    public func handle(state: StateType) -> StateType {
         var newstate = state
-        newstate.currentView = .todos
         newstate.todos = newstate.todos.filter{ $0.id != id }
         return newstate
     }
 }
 
 public struct ToggleTodoAction: ActionHandler {
-    
+    public typealias StateType = AppState
     let id:UUID
     
-    public func handle(state: AppState) -> AppState {
+    public func handle(state: StateType) -> StateType {
         
         var newState = state
-        newState.currentView = .todos
+        
         newState.todos =  newState.todos.map{ newTodo in
             if newTodo.id == id {
                 return modifyMatchedId(newTodo)
@@ -58,22 +91,22 @@ public struct ToggleTodoAction: ActionHandler {
 }
 
 
-struct NavigateToTodosAction: ActionHandler {
+struct NavigateToTodosAction: RouterHandler {
     
-    func handle(state: AppState) -> AppState {
-        var newState = state
-        newState.currentView = .todos
-        return newState
+    func handle(state: RouteState) -> RouteState {
+        var state = state
+        state.navigationState = .todos
+        return state
     }
-    
-    
+     
 }
-struct NavigateToDetailsAction: ActionHandler {
+
+struct NavigateToDetailsAction: RouterHandler {
     
-    func handle(state: AppState) -> AppState {
-        var newState = state
-        newState.currentView = .details
-        return newState
+    func handle(state: RouteState) -> RouteState {
+        var state = state
+        state.navigationState = .details
+        return state
     }
     
 }

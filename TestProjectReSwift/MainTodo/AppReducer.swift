@@ -11,8 +11,7 @@ import SwiftUI
 
 public func appReducer(action: Action, appState: AppState? ) -> AppState {
     
-    var state = appState ?? AppState(routeState: RouteState(navigationState: .todos))
-
+    var state = appState ?? AppState()
     if let action = action as? ActionHandler {
         state = action.handle(state: state)
     }

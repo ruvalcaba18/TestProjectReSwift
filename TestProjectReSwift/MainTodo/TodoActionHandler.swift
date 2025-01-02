@@ -6,3 +6,8 @@
 //
 
 import Foundation
+import ReSwift
+
+protocol ActionHandler: Action {
+    func handle(state: AppState) -> AppState
+}
